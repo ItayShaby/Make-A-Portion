@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import './TopBar.css';
 
 export default function TopBar({ onMenuClick }) {
@@ -33,9 +34,9 @@ export default function TopBar({ onMenuClick }) {
           <span className="topbar__badge" aria-hidden="true" />
         </button>
 
-        <div className="topbar__avatar" aria-label="User profile">
+        <Link to="/profile" className="topbar__avatar" aria-label="Go to profile">
           U
-        </div>
+        </Link>
       </div>
     </header>
   );
