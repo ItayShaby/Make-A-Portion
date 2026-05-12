@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(mkdir -p \"c:/לימודים/שנה ב'/פרויקט גמר פיתוח אתרים/MakeAPortion/make-a-portion/src/styles\" \"c:/לימודים/שנה ב'/פרויקט גמר פיתוח אתרים/MakeAPortion/make-a-portion/src/components\" \"c:/לימודים/שנה ב'/פרויקט גמר פיתוח אתרים/MakeAPortion/make-a-portion/src/pages\" && echo \"Folders created\")"
+    ],
+    "additionalDirectories": [
+      "c:\\לימודים\\שנה ב'\\פרויקט גמר פיתוח אתרים\\MakeAPortion\\make-a-portion\\src"
+    ]
+  }
+}
