@@ -81,7 +81,7 @@ export default function AddRecipePage() {
         {/* Ingredients */}
         <div className="add-recipe__section">
           <div className="add-recipe__table-header">
-            <h2 className="add-recipe__section-title" style={{ marginBottom: 0 }}>Ingredients</h2>
+            <h2 className="add-recipe__section-title add-recipe__section-title--flush">Ingredients</h2>
             <span className="add-recipe__badge">Dynamic Scaling Ready</span>
           </div>
 

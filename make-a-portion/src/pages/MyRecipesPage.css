@@ -48,6 +48,10 @@
   color: var(--color-white);
 }
 
+.my-recipes__card-link {
+  text-decoration: none;
+}
+
 /* Grid */
 .my-recipes__grid {
   display: grid;

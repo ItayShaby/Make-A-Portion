@@ -68,6 +68,10 @@
   margin-bottom: var(--space-3);
 }
 
+.add-recipe__section-title--flush {
+  margin-bottom: 0;
+}
+
 /* General info grid */
 .add-recipe__info-grid {
   display: grid;

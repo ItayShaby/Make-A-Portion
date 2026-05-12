@@ -42,7 +42,7 @@ export default function MyRecipesPage() {
 
       <div className="my-recipes__grid">
         {filtered.map((recipe) => (
-          <Link key={recipe.id} to={`/recipe/${recipe.id}`} style={{ textDecoration: 'none' }}>
+          <Link key={recipe.id} to={`/recipe/${recipe.id}`} className="my-recipes__card-link">
             <RecipeCard
               image={recipe.image}
               title={recipe.title}
