@@ -1,0 +1,105 @@
+.sidebar {
+  width: var(--sidebar-width);
+  height: 100vh;
+  background-color: var(--color-surface-container-low);
+  border-right: 1px solid var(--color-outline);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+}
+
+/* Logo */
+.sidebar__logo {
+  padding: var(--space-3) var(--space-3) var(--space-2);
+  border-bottom: 1px solid var(--color-outline);
+}
+
+.sidebar__logo-text {
+  font-family: var(--font-headline);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-primary);
+  line-height: 1.2;
+}
+
+.sidebar__logo-sub {
+  font-family: var(--font-body);
+  font-size: var(--text-caption);
+  color: var(--color-neutral);
+  margin-top: 2px;
+}
+
+/* Nav */
+.sidebar__nav {
+  flex: 1;
+  padding: var(--space-2) 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.sidebar__link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  font-family: var(--font-headline);
+  font-size: var(--text-label);
+  font-weight: 500;
+  color: var(--color-neutral);
+  border-left: 3px solid transparent;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.sidebar__link:hover {
+  background-color: var(--color-surface-container);
+  color: var(--color-on-surface);
+}
+
+.sidebar__link.active {
+  border-left-color: var(--color-primary);
+  color: var(--color-primary);
+  background-color: var(--color-surface-container);
+  font-weight: 600;
+}
+
+.sidebar__link svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+/* Sign Out */
+.sidebar__footer {
+  padding: var(--space-2) 0 var(--space-3);
+  border-top: 1px solid var(--color-outline);
+}
+
+.sidebar__signout {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-1) var(--space-3);
+  font-family: var(--font-headline);
+  font-size: var(--text-label);
+  font-weight: 500;
+  color: var(--color-neutral);
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.sidebar__signout:hover {
+  color: var(--color-error);
+}
+
+.sidebar__signout svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
