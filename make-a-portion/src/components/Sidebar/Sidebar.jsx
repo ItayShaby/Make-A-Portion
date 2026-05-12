@@ -56,9 +56,9 @@ const NAV_ITEMS = [
   },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen, onClose }) {
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar${isOpen ? ' sidebar--open' : ''}`}>
       <div className="sidebar__logo">
         <p className="sidebar__logo-text">Make A Portion</p>
         <p className="sidebar__logo-sub">Recipe Management</p>
@@ -73,6 +73,7 @@ export default function Sidebar() {
             className={({ isActive }) =>
               isActive ? 'sidebar__link active' : 'sidebar__link'
             }
+            onClick={onClose}
           >
             {icon}
             {label}

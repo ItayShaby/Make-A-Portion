@@ -75,6 +75,20 @@
   gap: var(--space-2);
 }
 
+@media (max-width: 600px) {
+  .add-recipe__info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .add-recipe__ing-row {
+    grid-template-columns: 1fr 100px 40px;
+  }
+
+  .add-recipe__title {
+    font-size: var(--text-md);
+  }
+}
+
 .add-recipe__field {
   display: flex;
   flex-direction: column;

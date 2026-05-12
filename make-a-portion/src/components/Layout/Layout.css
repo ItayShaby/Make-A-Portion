@@ -15,6 +15,35 @@
   flex: 1;
   padding: var(--space-4);
   background-color: var(--color-surface);
-  max-width: var(--container-max);
-  width: 100%;
+}
+
+/* Backdrop (mobile only) */
+.layout__backdrop {
+  display: none;
+}
+
+/* ── Mobile ─────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .layout__main {
+    margin-left: 0;
+  }
+
+  .layout__content {
+    padding: var(--space-2);
+  }
+
+  .layout__backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background-color: rgba(30, 27, 22, 0.4);
+    z-index: 99;
+  }
+}
+
+/* ── Desktop max-width cap ──────────────────────────────── */
+@media (min-width: 1440px) {
+  .layout__content {
+    max-width: var(--container-max);
+  }
 }

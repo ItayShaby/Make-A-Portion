@@ -55,6 +55,16 @@
   gap: var(--space-3);
 }
 
+@media (max-width: 600px) {
+  .my-recipes__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .my-recipes__title {
+    font-size: var(--text-md);
+  }
+}
+
 /* Create new card */
 .my-recipes__create-card {
   background-color: var(--color-white);

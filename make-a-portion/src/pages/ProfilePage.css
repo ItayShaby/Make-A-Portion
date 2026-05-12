@@ -93,6 +93,30 @@
   color: var(--color-primary);
 }
 
+@media (max-width: 600px) {
+  .profile__header {
+    flex-wrap: wrap;
+  }
+
+  .profile__edit-btn {
+    width: 100%;
+  }
+
+  .profile__row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+  }
+
+  .profile__segment {
+    width: 100%;
+  }
+
+  .profile__segment-btn {
+    flex: 1;
+  }
+}
+
 /* Section card */
 .profile__section {
   background-color: var(--color-white);
