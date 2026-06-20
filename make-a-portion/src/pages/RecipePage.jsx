@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import './RecipePage.css';
 
 const BASE_SERVINGS = 4;
@@ -29,8 +30,14 @@ function formatQty(value) {
 export default function RecipePage() {
   const [servings, setServings] = useState(BASE_SERVINGS);
   const [unit, setUnit] = useState('metric');
+  const { requireAuth } = useAuth();
 
   const ratio = servings / BASE_SERVINGS;
+
+  // Changing measurement units requires login; guests get the popup.
+  function changeUnit(nextUnit) {
+    requireAuth(() => setUnit(nextUnit));
+  }
 
   return (
     <div className="recipe-page">
@@ -71,13 +78,13 @@ export default function RecipePage() {
         <div className="recipe-page__unit-toggle">
           <button
             className={`recipe-page__unit-btn${unit === 'metric' ? ' recipe-page__unit-btn--active' : ''}`}
-            onClick={() => setUnit('metric')}
+            onClick={() => changeUnit('metric')}
           >
             Metric
           </button>
           <button
             className={`recipe-page__unit-btn${unit === 'imperial' ? ' recipe-page__unit-btn--active' : ''}`}
-            onClick={() => setUnit('imperial')}
+            onClick={() => changeUnit('imperial')}
           >
             Imperial
           </button>

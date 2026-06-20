@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import RecipeCard from '../components/RecipeCard/RecipeCard';
+import { useAuth } from '../context/AuthContext';
 import './MyRecipesPage.css';
 
 const FILTERS = ['All Recipes', 'Breakfast', 'Main Course', 'Desserts', 'Quick'];
@@ -16,16 +17,25 @@ const RECIPES = [
 
 export default function MyRecipesPage() {
   const [activeFilter, setActiveFilter] = useState('All Recipes');
+  const { user, openLogin } = useAuth();
 
   const filtered = activeFilter === 'All Recipes'
     ? RECIPES
     : RECIPES.filter((r) => r.category === activeFilter);
 
+  // Guests can browse, but adding a recipe opens the login popup.
+  function handleCreate(e) {
+    if (!user) {
+      e.preventDefault();
+      openLogin();
+    }
+  }
+
   return (
     <div>
       <div className="my-recipes__header">
-        <h1 className="my-recipes__title">My Recipes</h1>
-        <p className="my-recipes__subtitle">All your saved recipes in one place.</p>
+        <h1 className="my-recipes__title">Discover Recipes</h1>
+        <p className="my-recipes__subtitle">Browse every recipe shared on Make A Portion.</p>
       </div>
 
       <div className="my-recipes__filters">
@@ -54,7 +64,7 @@ export default function MyRecipesPage() {
           </Link>
         ))}
 
-        <Link to="/add-recipe" className="my-recipes__create-card">
+        <Link to="/add-recipe" onClick={handleCreate} className="my-recipes__create-card">
           <div className="my-recipes__create-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="12" y1="5" x2="12" y2="19" />
