@@ -113,6 +113,21 @@
   border: 2px solid var(--color-white);
 }
 
+/* Greeting */
+.topbar__greeting {
+  font-family: var(--font-headline);
+  font-size: var(--text-label);
+  font-weight: 500;
+  color: var(--color-on-surface);
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .topbar__greeting {
+    display: none;
+  }
+}
+
 /* Avatar */
 .topbar__avatar {
   width: 36px;

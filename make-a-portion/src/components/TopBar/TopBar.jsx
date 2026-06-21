@@ -1,7 +1,22 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import { useRecipes } from '../../context/RecipesContext';
 import './TopBar.css';
 
 export default function TopBar({ onMenuClick }) {
+  const { user, profile } = useAuth();
+  const { searchTerm, setSearchTerm } = useRecipes();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const firstName = profile?.firstName || '';
+  const initial = firstName ? firstName[0].toUpperCase() : 'U';
+
+  function handleSearch(e) {
+    setSearchTerm(e.target.value);
+    // Show results on the Discover page.
+    if (location.pathname !== '/') navigate('/');
+  }
+
   return (
     <header className="topbar">
       <button className="topbar__menu-btn" onClick={onMenuClick} aria-label="Open menu">
@@ -20,22 +35,20 @@ export default function TopBar({ onMenuClick }) {
         <input
           className="topbar__search-input"
           type="text"
-          placeholder="Search your recipes..."
+          placeholder="Search recipes..."
           aria-label="Search recipes"
+          value={searchTerm}
+          onChange={handleSearch}
         />
       </div>
 
       <div className="topbar__actions">
-        <button className="topbar__icon-btn" aria-label="Notifications">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-          </svg>
-          <span className="topbar__badge" aria-hidden="true" />
-        </button>
+        {user && firstName && (
+          <span className="topbar__greeting">Hi, {firstName}</span>
+        )}
 
         <Link to="/profile" className="topbar__avatar" aria-label="Go to profile">
-          U
+          {initial}
         </Link>
       </div>
     </header>

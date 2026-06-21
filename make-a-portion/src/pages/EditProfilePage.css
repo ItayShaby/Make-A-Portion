@@ -1,0 +1,189 @@
+.edit-profile {
+  max-width: 720px;
+}
+
+.edit-profile__title {
+  font-family: var(--font-headline);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  color: var(--color-on-surface);
+  margin-bottom: var(--space-4);
+}
+
+.edit-profile__form {
+  background-color: var(--color-white);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-1);
+  padding: var(--space-4);
+}
+
+/* Avatar */
+.edit-profile__avatar-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-outline);
+}
+
+.edit-profile__avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.edit-profile__avatar--placeholder {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  font-family: var(--font-headline);
+  font-size: var(--text-lg);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.edit-profile__avatar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.edit-profile__upload-btn {
+  padding: 6px var(--space-2);
+  border: 1px solid var(--color-outline);
+  border-radius: var(--radius-sm);
+  background: none;
+  font-family: var(--font-headline);
+  font-size: var(--text-label);
+  font-weight: 500;
+  color: var(--color-on-surface);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.edit-profile__upload-btn:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.edit-profile__remove-btn {
+  background: none;
+  border: none;
+  font-family: var(--font-headline);
+  font-size: var(--text-label);
+  color: var(--color-neutral);
+  cursor: pointer;
+}
+
+.edit-profile__remove-btn:hover {
+  color: var(--color-error);
+}
+
+/* Fields */
+.edit-profile__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+}
+
+@media (max-width: 600px) {
+  .edit-profile__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.edit-profile__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.edit-profile__field--full {
+  grid-column: 1 / -1;
+}
+
+.edit-profile__label {
+  font-family: var(--font-headline);
+  font-size: var(--text-label);
+  font-weight: 500;
+  color: var(--color-on-surface);
+}
+
+.edit-profile__input {
+  border: 1px solid var(--color-outline);
+  border-radius: var(--radius-sm);
+  padding: var(--space-1) var(--space-2);
+  font-family: var(--font-body);
+  font-size: var(--text-body);
+  color: var(--color-on-surface);
+  background-color: var(--color-white);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.edit-profile__input::placeholder {
+  color: var(--color-neutral);
+}
+
+.edit-profile__input:focus {
+  border-color: var(--color-primary);
+}
+
+/* Actions */
+.edit-profile__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+}
+
+.edit-profile__cancel-btn {
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-outline);
+  border-radius: var(--radius-sm);
+  background: none;
+  font-family: var(--font-headline);
+  font-size: var(--text-body);
+  font-weight: 500;
+  color: var(--color-on-surface);
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.edit-profile__cancel-btn:hover {
+  border-color: var(--color-neutral);
+}
+
+.edit-profile__save-btn {
+  padding: var(--space-1) var(--space-5);
+  background-color: var(--color-primary);
+  color: var(--color-white);
+  font-family: var(--font-headline);
+  font-size: var(--text-body);
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.edit-profile__save-btn:hover {
+  background-color: var(--color-primary-dark);
+}
+
+.edit-profile__save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.edit-profile__error {
+  margin-top: var(--space-2);
+  text-align: right;
+  font-family: var(--font-body);
+  font-size: var(--text-label);
+  color: var(--color-error);
+}

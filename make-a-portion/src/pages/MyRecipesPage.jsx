@@ -1,70 +1,88 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import RecipeCard from '../components/RecipeCard/RecipeCard';
 import { useAuth } from '../context/AuthContext';
+import { useRecipes } from '../context/RecipesContext';
+import { supabase } from '../lib/supabase';
 import './MyRecipesPage.css';
 
-const FILTERS = ['All Recipes', 'Breakfast', 'Main Course', 'Desserts', 'Quick'];
-
-const RECIPES = [
-  { id: 1, title: 'Shakshuka with Feta', category: 'Breakfast', time: '25 min', author: 'You', rating: '4.8', image: 'https://placehold.co/400x300' },
-  { id: 2, title: 'Lemon Herb Roast Chicken', category: 'Main Course', time: '1h 20min', author: 'You', rating: '4.9', image: 'https://placehold.co/400x300' },
-  { id: 3, title: 'Chocolate Lava Cake', category: 'Desserts', time: '20 min', author: 'You', rating: '5.0', image: 'https://placehold.co/400x300' },
-  { id: 4, title: 'Avocado Toast', category: 'Quick', time: '10 min', author: 'You', rating: '4.5', image: 'https://placehold.co/400x300' },
-  { id: 5, title: 'Pasta Carbonara', category: 'Main Course', time: '30 min', author: 'You', rating: '4.7', image: 'https://placehold.co/400x300' },
-  { id: 6, title: 'Banana Pancakes', category: 'Breakfast', time: '20 min', author: 'You', rating: '4.6', image: 'https://placehold.co/400x300' },
-];
-
 export default function MyRecipesPage() {
-  const [activeFilter, setActiveFilter] = useState('All Recipes');
-  const { user, openLogin } = useAuth();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { getMyRecipes, loading, error, refresh } = useRecipes();
+  const [deletingId, setDeletingId] = useState(null);
 
-  const filtered = activeFilter === 'All Recipes'
-    ? RECIPES
-    : RECIPES.filter((r) => r.category === activeFilter);
+  const myRecipes = getMyRecipes(user?.id);
 
-  // Guests can browse, but adding a recipe opens the login popup.
-  function handleCreate(e) {
-    if (!user) {
-      e.preventDefault();
-      openLogin();
+  async function handleDelete(recipe) {
+    if (!window.confirm(`Delete "${recipe.title}"? This can't be undone.`)) return;
+
+    setDeletingId(recipe.id);
+    const { error: deleteError } = await supabase
+      .from('Recipe')
+      .delete()
+      .eq('id', recipe.id);
+    setDeletingId(null);
+
+    if (deleteError) {
+      console.error('Failed to delete recipe:', deleteError);
+      window.alert('Could not delete the recipe. Please try again.');
+      return;
     }
+    await refresh();
   }
 
   return (
     <div>
       <div className="my-recipes__header">
-        <h1 className="my-recipes__title">Discover Recipes</h1>
-        <p className="my-recipes__subtitle">Browse every recipe shared on Make A Portion.</p>
+        <h1 className="my-recipes__title">My Recipes</h1>
+        <p className="my-recipes__subtitle">Recipes you've created on Make A Portion.</p>
       </div>
 
-      <div className="my-recipes__filters">
-        {FILTERS.map((filter) => (
-          <button
-            key={filter}
-            className={`my-recipes__filter-btn${activeFilter === filter ? ' my-recipes__filter-btn--active' : ''}`}
-            onClick={() => setActiveFilter(filter)}
-          >
-            {filter}
-          </button>
-        ))}
-      </div>
+      {loading && <p className="my-recipes__status">Loading recipes…</p>}
 
+      {error && (
+        <div className="my-recipes__status my-recipes__status--error">
+          <p>{error}</p>
+          <button className="my-recipes__retry-btn" onClick={refresh}>Try again</button>
+        </div>
+      )}
+
+      {!loading && !error && (
       <div className="my-recipes__grid">
-        {filtered.map((recipe) => (
-          <Link key={recipe.id} to={`/recipe/${recipe.id}`} className="my-recipes__card-link">
-            <RecipeCard
-              image={recipe.image}
-              title={recipe.title}
-              category={recipe.category}
-              time={recipe.time}
-              author={recipe.author}
-              rating={recipe.rating}
-            />
-          </Link>
+        {myRecipes.map((recipe) => (
+          <div key={recipe.id} className="my-recipes__card-wrap">
+            <Link to={`/recipe/${recipe.id}`} className="my-recipes__card-link">
+              <RecipeCard
+                image={recipe.image}
+                title={recipe.title}
+                category={recipe.category}
+                time={recipe.time}
+                author={recipe.author}
+                rating={recipe.rating}
+              />
+            </Link>
+            <div className="my-recipes__card-actions">
+              <button
+                type="button"
+                className="my-recipes__action-btn"
+                onClick={() => navigate(`/edit-recipe/${recipe.id}`)}
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                className="my-recipes__action-btn my-recipes__action-btn--danger"
+                onClick={() => handleDelete(recipe)}
+                disabled={deletingId === recipe.id}
+              >
+                {deletingId === recipe.id ? 'Deleting…' : 'Delete'}
+              </button>
+            </div>
+          </div>
         ))}
 
-        <Link to="/add-recipe" onClick={handleCreate} className="my-recipes__create-card">
+        <Link to="/add-recipe" className="my-recipes__create-card">
           <div className="my-recipes__create-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <line x1="12" y1="5" x2="12" y2="19" />
@@ -72,9 +90,12 @@ export default function MyRecipesPage() {
             </svg>
           </div>
           <span className="my-recipes__create-label">Create New</span>
-          <span className="my-recipes__create-hint">Add your first recipe</span>
+          <span className="my-recipes__create-hint">
+            {myRecipes.length === 0 ? 'Add your first recipe' : 'Add another recipe'}
+          </span>
         </Link>
       </div>
+      )}
     </div>
   );
 }

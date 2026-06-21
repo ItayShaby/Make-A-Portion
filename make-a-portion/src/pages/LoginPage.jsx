@@ -129,7 +129,7 @@ export default function LoginPage() {
       <div className="login__image-panel">
         <img
           className="login__image"
-          src="https://placehold.co/900x1080"
+          src="https://images.unsplash.com/photo-1556909212-d5b604d0c90d?auto=format&fit=crop&w=900&q=80"
           alt="A beautifully arranged kitchen scene"
         />
         <div className="login__image-overlay" />

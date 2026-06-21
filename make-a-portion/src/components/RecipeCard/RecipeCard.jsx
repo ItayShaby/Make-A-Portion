@@ -1,13 +1,38 @@
 import './RecipeCard.css';
 
-export default function RecipeCard({ image, title, category, time, author, rating }) {
+export default function RecipeCard({ image, title, category, time, author, rating, favorite, onToggleFavorite }) {
+  function handleFav(e) {
+    // Stop the click from following the surrounding card link.
+    e.preventDefault();
+    e.stopPropagation();
+    onToggleFavorite?.();
+  }
+
   return (
     <article className="recipe-card">
-      <img
-        className="recipe-card__image"
-        src={image || 'https://placehold.co/400x300'}
-        alt={title}
-      />
+      <div className="recipe-card__image-wrap">
+        <img
+          className="recipe-card__image"
+          src={image || 'https://placehold.co/400x300?text=Recipe'}
+          alt={title}
+          loading="lazy"
+          onError={(e) => {
+            e.currentTarget.src = 'https://placehold.co/400x300?text=Recipe';
+          }}
+        />
+        {onToggleFavorite && (
+          <button
+            type="button"
+            className={`recipe-card__fav${favorite ? ' recipe-card__fav--active' : ''}`}
+            onClick={handleFav}
+            aria-label={favorite ? 'Remove from favorites' : 'Save to favorites'}
+          >
+            <svg viewBox="0 0 24 24" fill={favorite ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            </svg>
+          </button>
+        )}
+      </div>
 
       <div className="recipe-card__body">
         {category && (

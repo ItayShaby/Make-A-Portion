@@ -1,56 +1,160 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useRecipes, DEFAULT_RECIPE_IMAGE } from '../context/RecipesContext';
+import {
+  getRecipe,
+  getRecipeIngredients,
+  getRecipeRating,
+  rateRecipe,
+  getComments,
+  addComment,
+  deleteComment,
+} from '../lib/db';
 import './RecipePage.css';
 
-const BASE_SERVINGS = 4;
-
-const RECIPE = {
-  title: 'Lemon Herb Roast Chicken',
-  category: 'Main Course',
-  description:
-    'A classic Sunday roast elevated with bright lemon zest, fresh thyme, and garlic butter tucked under the skin. The result is a golden, juicy bird with crispy skin and a fragrant pan sauce that begs for crusty bread.',
-  image: 'https://placehold.co/1200x500',
-  ingredients: [
-    { name: 'Whole chicken', baseQty: 1.5, metricUnit: 'kg', imperialQty: 3.3, imperialUnit: 'lb' },
-    { name: 'Lemon', baseQty: 2, metricUnit: '', imperialQty: 2, imperialUnit: '' },
-    { name: 'Garlic cloves', baseQty: 6, metricUnit: '', imperialQty: 6, imperialUnit: '' },
-    { name: 'Butter', baseQty: 60, metricUnit: 'g', imperialQty: 2.1, imperialUnit: 'oz' },
-    { name: 'Fresh thyme', baseQty: 10, metricUnit: 'g', imperialQty: 0.35, imperialUnit: 'oz' },
-    { name: 'Olive oil', baseQty: 30, metricUnit: 'ml', imperialQty: 1, imperialUnit: 'fl oz' },
-    { name: 'Salt', baseQty: 8, metricUnit: 'g', imperialQty: 0.28, imperialUnit: 'oz' },
-    { name: 'Black pepper', baseQty: 3, metricUnit: 'g', imperialQty: 0.1, imperialUnit: 'oz' },
-  ],
-};
-
 function formatQty(value) {
-  const rounded = Math.round(value * 10) / 10;
-  return rounded % 1 === 0 ? rounded.toString() : rounded.toFixed(1);
+  if (value == null) return '';
+  const rounded = Math.round(value * 100) / 100;
+  return rounded % 1 === 0 ? rounded.toString() : String(rounded);
 }
 
 export default function RecipePage() {
-  const [servings, setServings] = useState(BASE_SERVINGS);
-  const [unit, setUnit] = useState('metric');
-  const { requireAuth } = useAuth();
+  const { id } = useParams();
+  const { user, requireAuth } = useAuth();
+  const { isFavorite, toggleFavorite } = useRecipes();
 
-  const ratio = servings / BASE_SERVINGS;
+  const [recipe, setRecipe] = useState(null);
+  const [ingredients, setIngredients] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // Changing measurement units requires login; guests get the popup.
-  function changeUnit(nextUnit) {
-    requireAuth(() => setUnit(nextUnit));
+  const [servings, setServings] = useState(4);
+  const [rating, setRating] = useState({ average: 0, count: 0, mine: 0 });
+  const [hoverRating, setHoverRating] = useState(0);
+
+  const [comments, setComments] = useState([]);
+  const [commentText, setCommentText] = useState('');
+  const [posting, setPosting] = useState(false);
+
+  const loadRating = useCallback(async () => {
+    try {
+      setRating(await getRecipeRating(id, user?.id));
+    } catch (err) {
+      console.error('Failed to load rating:', err);
+    }
+  }, [id, user?.id]);
+
+  const loadComments = useCallback(async () => {
+    try {
+      setComments(await getComments(id));
+    } catch (err) {
+      console.error('Failed to load comments:', err);
+    }
+  }, [id]);
+
+  useEffect(() => {
+    let active = true;
+    async function load() {
+      setLoading(true);
+      setError('');
+      try {
+        const r = await getRecipe(id);
+        if (!active) return;
+        setRecipe(r);
+        setServings(r.base_servings || 4);
+        const ings = await getRecipeIngredients(id);
+        if (active) setIngredients(ings);
+      } catch (err) {
+        console.error('Failed to load recipe:', err);
+        if (active) setError('Could not load this recipe.');
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+    load();
+    loadRating();
+    loadComments();
+    return () => { active = false; };
+  }, [id, loadRating, loadComments]);
+
+  if (loading) {
+    return <p className="recipe-page__status">Loading recipe…</p>;
+  }
+  if (error || !recipe) {
+    return <p className="recipe-page__status recipe-page__status--error">{error || 'Recipe not found.'}</p>;
+  }
+
+  const baseServings = recipe.base_servings || 4;
+  const ratio = servings / baseServings;
+  const cover = recipe.cover_img_url || DEFAULT_RECIPE_IMAGE;
+  const authorName = recipe.author?.full_name || 'Unknown';
+  const fav = isFavorite(recipe.id);
+
+  function onToggleFav() {
+    requireAuth(() => toggleFavorite(recipe.id));
+  }
+
+  function rate(value) {
+    requireAuth(async () => {
+      try {
+        await rateRecipe(id, user.id, value);
+        await loadRating();
+      } catch (err) {
+        console.error('Failed to save rating:', err);
+      }
+    });
+  }
+
+  function submitComment(e) {
+    e.preventDefault();
+    const text = commentText.trim();
+    if (!text) return;
+    requireAuth(async () => {
+      setPosting(true);
+      try {
+        await addComment(id, user.id, text);
+        setCommentText('');
+        await loadComments();
+      } catch (err) {
+        console.error('Failed to post comment:', err);
+      } finally {
+        setPosting(false);
+      }
+    });
+  }
+
+  async function removeComment(commentId) {
+    if (!window.confirm('Delete this comment?')) return;
+    try {
+      await deleteComment(commentId);
+      await loadComments();
+    } catch (err) {
+      console.error('Failed to delete comment:', err);
+    }
   }
 
   return (
     <div className="recipe-page">
-      <img
-        className="recipe-page__cover"
-        src={RECIPE.image}
-        alt={RECIPE.title}
-      />
+      <img className="recipe-page__cover" src={cover} alt={recipe.title} />
 
       <div className="recipe-page__header">
-        <span className="recipe-page__category">{RECIPE.category}</span>
-        <h1 className="recipe-page__title">{RECIPE.title}</h1>
-        <p className="recipe-page__description">{RECIPE.description}</p>
+        <div className="recipe-page__header-top">
+          <span className="recipe-page__category">{recipe.category}</span>
+          <button
+            className={`recipe-page__fav${fav ? ' recipe-page__fav--active' : ''}`}
+            onClick={onToggleFav}
+            aria-label={fav ? 'Remove from favorites' : 'Save to favorites'}
+          >
+            <svg viewBox="0 0 24 24" fill={fav ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+            </svg>
+            {fav ? 'Saved' : 'Save'}
+          </button>
+        </div>
+        <h1 className="recipe-page__title">{recipe.title}</h1>
+        <p className="recipe-page__author">by {authorName}</p>
+        {recipe.description && <p className="recipe-page__description">{recipe.description}</p>}
       </div>
 
       <div className="recipe-page__controls">
@@ -74,43 +178,108 @@ export default function RecipePage() {
             +
           </button>
         </div>
-
-        <div className="recipe-page__unit-toggle">
-          <button
-            className={`recipe-page__unit-btn${unit === 'metric' ? ' recipe-page__unit-btn--active' : ''}`}
-            onClick={() => changeUnit('metric')}
-          >
-            Metric
-          </button>
-          <button
-            className={`recipe-page__unit-btn${unit === 'imperial' ? ' recipe-page__unit-btn--active' : ''}`}
-            onClick={() => changeUnit('imperial')}
-          >
-            Imperial
-          </button>
-        </div>
       </div>
 
       <h2 className="recipe-page__section-title">Ingredients</h2>
       <div className="recipe-page__ingredients">
-        {RECIPE.ingredients.map((ing) => {
-          const qty = unit === 'metric'
-            ? formatQty(ing.baseQty * ratio)
-            : formatQty(ing.imperialQty * ratio);
-          const unitLabel = unit === 'metric' ? ing.metricUnit : ing.imperialUnit;
-
-          return (
-            <div key={ing.name} className="recipe-page__ingredient">
-              <span className="recipe-page__ingredient-name">{ing.name}</span>
-              <span className="recipe-page__ingredient-qty">
-                {qty}{unitLabel ? ` ${unitLabel}` : ''}
-              </span>
-            </div>
-          );
-        })}
+        {ingredients.length === 0 ? (
+          <p className="recipe-page__comments-empty">No ingredients listed.</p>
+        ) : (
+          ingredients.map((ing) => {
+            const qty = ing.quantity != null ? formatQty(ing.quantity * ratio) : '';
+            return (
+              <div key={ing.id} className="recipe-page__ingredient">
+                <span className="recipe-page__ingredient-name">{ing.name}</span>
+                <span className="recipe-page__ingredient-qty">
+                  {qty}{qty && ing.unit ? ` ${ing.unit}` : ing.unit || ''}
+                </span>
+              </div>
+            );
+          })
+        )}
       </div>
 
-      <button className="recipe-page__cta">Start Cooking</button>
+      {recipe.instructions && (
+        <>
+          <h2 className="recipe-page__section-title">Preparation</h2>
+          <p className="recipe-page__instructions">{recipe.instructions}</p>
+        </>
+      )}
+
+      {/* Rating */}
+      <h2 className="recipe-page__section-title">Rate this recipe</h2>
+      <div className="recipe-page__rating">
+        <div
+          className="recipe-page__stars"
+          onMouseLeave={() => setHoverRating(0)}
+          role="radiogroup"
+          aria-label="Your rating"
+        >
+          {[1, 2, 3, 4, 5].map((value) => {
+            const active = (hoverRating || rating.mine) >= value;
+            return (
+              <button
+                key={value}
+                type="button"
+                className={`recipe-page__star${active ? ' recipe-page__star--active' : ''}`}
+                onMouseEnter={() => setHoverRating(value)}
+                onClick={() => rate(value)}
+                aria-label={`${value} star${value > 1 ? 's' : ''}`}
+                role="radio"
+                aria-checked={rating.mine === value}
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                </svg>
+              </button>
+            );
+          })}
+        </div>
+        <span className="recipe-page__rating-hint">
+          {rating.count > 0
+            ? `${rating.average.toFixed(1)} average · ${rating.count} rating${rating.count > 1 ? 's' : ''}`
+            : 'No ratings yet'}
+          {rating.mine ? ` · you rated ${rating.mine}/5` : ''}
+        </span>
+      </div>
+
+      {/* Comments */}
+      <h2 className="recipe-page__section-title">Comments</h2>
+      <form className="recipe-page__comment-form" onSubmit={submitComment}>
+        <textarea
+          className="recipe-page__comment-input"
+          rows="3"
+          placeholder="Share a tip or how it turned out…"
+          value={commentText}
+          onChange={(e) => setCommentText(e.target.value)}
+        />
+        <button type="submit" className="recipe-page__comment-btn" disabled={posting}>
+          {posting ? 'Posting…' : 'Post Comment'}
+        </button>
+      </form>
+
+      <div className="recipe-page__comments">
+        {comments.length === 0 ? (
+          <p className="recipe-page__comments-empty">No comments yet — be the first.</p>
+        ) : (
+          comments.map((c) => (
+            <div key={c.id} className="recipe-page__comment">
+              <div className="recipe-page__comment-head">
+                <span className="recipe-page__comment-author">{c.author}</span>
+                {user && c.userId === user.id && (
+                  <button
+                    className="recipe-page__comment-delete"
+                    onClick={() => removeComment(c.id)}
+                  >
+                    Delete
+                  </button>
+                )}
+              </div>
+              <p className="recipe-page__comment-text">{c.content}</p>
+            </div>
+          ))
+        )}
+      </div>
     </div>
   );
 }

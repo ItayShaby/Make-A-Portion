@@ -29,6 +29,10 @@
   flex-shrink: 0;
 }
 
+.profile__avatar--img {
+  object-fit: cover;
+}
+
 .profile__info {
   flex: 1;
 }

@@ -1,19 +1,32 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import './ProfilePage.css';
 
 export default function ProfilePage() {
+  const navigate = useNavigate();
+  const { profile } = useAuth();
   const [tempUnit, setTempUnit] = useState('celsius');
   const [scaleSync, setScaleSync] = useState(false);
+
+  const fullName =
+    [profile?.firstName, profile?.lastName].filter(Boolean).join(' ') ||
+    'User Name';
+  const initial = (profile?.firstName || 'U')[0].toUpperCase();
 
   return (
     <div className="profile">
 
       {/* Header */}
       <div className="profile__header">
-        <div className="profile__avatar">U</div>
+        {profile?.avatarUrl ? (
+          <img className="profile__avatar profile__avatar--img" src={profile.avatarUrl} alt={fullName} />
+        ) : (
+          <div className="profile__avatar">{initial}</div>
+        )}
 
         <div className="profile__info">
-          <h1 className="profile__name">User Name</h1>
+          <h1 className="profile__name">{fullName}</h1>
           <p className="profile__role">Home Cook</p>
           <div className="profile__badges">
             <span className="profile__badge profile__badge--premium">★ Premium</span>
@@ -21,7 +34,9 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <button className="profile__edit-btn">Edit Profile</button>
+        <button className="profile__edit-btn" onClick={() => navigate('/profile/edit')}>
+          Edit Profile
+        </button>
       </div>
 
       {/* Kitchen Preferences */}
@@ -78,7 +93,8 @@ export default function ProfilePage() {
             className="profile__field-input"
             id="profile-email"
             type="email"
-            defaultValue="user@example.com"
+            value={profile?.email || ''}
+            readOnly
           />
         </div>
 

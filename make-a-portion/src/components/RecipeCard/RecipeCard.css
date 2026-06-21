@@ -15,11 +15,45 @@
 }
 
 /* Image */
+.recipe-card__image-wrap {
+  position: relative;
+}
+
 .recipe-card__image {
   width: 100%;
   aspect-ratio: 4 / 3;
   object-fit: cover;
   display: block;
+}
+
+.recipe-card__fav {
+  position: absolute;
+  top: var(--space-1);
+  right: var(--space-1);
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-full);
+  border: none;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: var(--color-neutral);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.15s, background-color 0.15s;
+}
+
+.recipe-card__fav svg {
+  width: 18px;
+  height: 18px;
+}
+
+.recipe-card__fav:hover {
+  color: var(--color-primary);
+}
+
+.recipe-card__fav--active {
+  color: var(--color-primary);
 }
 
 /* Body */
