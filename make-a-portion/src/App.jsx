@@ -8,6 +8,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DiscoverPage from './pages/DiscoverPage';
 import MyRecipesPage from './pages/MyRecipesPage';
+import FavoritesPage from './pages/FavoritesPage';
 import RecipePage from './pages/RecipePage';
 import AddRecipePage from './pages/AddRecipePage';
 import ProfilePage from './pages/ProfilePage';
@@ -30,6 +31,7 @@ export default function App() {
 
               {/* Protected — require a logged-in user */}
               <Route element={<ProtectedRoute />}>
+                <Route path="/favorites" element={<FavoritesPage />} />
                 <Route path="/my-recipes" element={<MyRecipesPage />} />
                 <Route path="/add-recipe" element={<AddRecipePage />} />
                 <Route path="/edit-recipe/:id" element={<AddRecipePage />} />

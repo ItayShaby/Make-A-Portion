@@ -19,9 +19,29 @@ function formatQty(value) {
   return rounded % 1 === 0 ? rounded.toString() : String(rounded);
 }
 
+// Metric → imperial conversions for the weight/volume units we store.
+// Count-based units (יחידות, כפות, שיני…) are left unchanged.
+const CONVERSIONS = {
+  'גרם': { factor: 1 / 28.3495, unit: 'אונקיות' },        // g → oz
+  'קג': { factor: 2.20462, unit: 'פאונד' },               // kg → lb
+  'ק"ג': { factor: 2.20462, unit: 'פאונד' },
+  'מ"ל': { factor: 1 / 29.5735, unit: 'אונקיות נוזל' },   // ml → fl oz
+  'מל': { factor: 1 / 29.5735, unit: 'אונקיות נוזל' },
+  'ליטר': { factor: 4.22675, unit: 'כוסות' },             // l → cups
+  'ל': { factor: 4.22675, unit: 'כוסות' },
+};
+
+// Convert a quantity+unit to the chosen system. Unknown (count) units pass through.
+function convertUnit(quantity, unit, system) {
+  if (system !== 'imperial' || quantity == null) return { quantity, unit };
+  const conv = CONVERSIONS[(unit || '').trim()];
+  if (!conv) return { quantity, unit };
+  return { quantity: quantity * conv.factor, unit: conv.unit };
+}
+
 export default function RecipePage() {
   const { id } = useParams();
-  const { user, requireAuth } = useAuth();
+  const { user, profile, requireAuth } = useAuth();
   const { isFavorite, toggleFavorite } = useRecipes();
 
   const [recipe, setRecipe] = useState(null);
@@ -30,6 +50,7 @@ export default function RecipePage() {
   const [error, setError] = useState('');
 
   const [servings, setServings] = useState(4);
+  const [unitSystem, setUnitSystem] = useState('metric');
   const [rating, setRating] = useState({ average: 0, count: 0, mine: 0 });
   const [hoverRating, setHoverRating] = useState(0);
 
@@ -77,6 +98,11 @@ export default function RecipePage() {
     loadComments();
     return () => { active = false; };
   }, [id, loadRating, loadComments]);
+
+  // Default the unit system to the user's profile preference.
+  useEffect(() => {
+    if (profile?.measurementSystem) setUnitSystem(profile.measurementSystem);
+  }, [profile?.measurementSystem]);
 
   if (loading) {
     return <p className="recipe-page__status">Loading recipe…</p>;
@@ -178,6 +204,21 @@ export default function RecipePage() {
             +
           </button>
         </div>
+
+        <div className="recipe-page__unit-toggle">
+          <button
+            className={`recipe-page__unit-btn${unitSystem === 'metric' ? ' recipe-page__unit-btn--active' : ''}`}
+            onClick={() => setUnitSystem('metric')}
+          >
+            Metric
+          </button>
+          <button
+            className={`recipe-page__unit-btn${unitSystem === 'imperial' ? ' recipe-page__unit-btn--active' : ''}`}
+            onClick={() => setUnitSystem('imperial')}
+          >
+            Imperial
+          </button>
+        </div>
       </div>
 
       <h2 className="recipe-page__section-title">Ingredients</h2>
@@ -186,12 +227,15 @@ export default function RecipePage() {
           <p className="recipe-page__comments-empty">No ingredients listed.</p>
         ) : (
           ingredients.map((ing) => {
-            const qty = ing.quantity != null ? formatQty(ing.quantity * ratio) : '';
+            const scaled = ing.quantity != null ? ing.quantity * ratio : null;
+            const conv = convertUnit(scaled, ing.unit, unitSystem);
+            const qty = formatQty(conv.quantity);
+            const unitLabel = conv.unit || '';
             return (
               <div key={ing.id} className="recipe-page__ingredient">
                 <span className="recipe-page__ingredient-name">{ing.name}</span>
                 <span className="recipe-page__ingredient-qty">
-                  {qty}{qty && ing.unit ? ` ${ing.unit}` : ing.unit || ''}
+                  {qty}{qty && unitLabel ? ` ${unitLabel}` : unitLabel}
                 </span>
               </div>
             );

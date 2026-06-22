@@ -221,12 +221,16 @@ export async function ensureUserProfile(user) {
     .eq('id', user.id)
     .maybeSingle();
   if (!data) {
-    // "full name" is NOT NULL — default it to the email prefix for new users.
-    const defaultName = (user.email || '').split('@')[0] || 'New User';
+    // "full name" is NOT NULL. Prefer the name from the auth provider (e.g.
+    // Google), otherwise fall back to the email prefix.
+    const meta = user.user_metadata || {};
+    const fullName =
+      meta.full_name || meta.name || (user.email || '').split('@')[0] || 'New User';
     await supabase.from('Users').insert({
       id: user.id,
       email: user.email,
-      'full name': defaultName,
+      'full name': fullName,
+      avatar_url: meta.avatar_url || meta.picture || null,
     });
   }
 }
