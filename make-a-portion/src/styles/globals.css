@@ -1,5 +1,5 @@
 /* ─── Google Fonts ─────────────────────────────────────────────────────────── */
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&family=Newsreader:ital,wght@0,400;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 
 /* ─── CSS Custom Properties ────────────────────────────────────────────────── */
 :root {
@@ -35,8 +35,8 @@
   --color-on-error: #ffffff;
 
   /* Typography — Families */
-  --font-headline: 'Outfit', sans-serif;
-  --font-body: 'Newsreader', serif;
+  --font-headline: 'Rubik', sans-serif;
+  --font-body: 'Rubik', sans-serif;
 
   /* Typography — Sizes */
   --text-xl: 48px;
