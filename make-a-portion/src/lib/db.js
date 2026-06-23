@@ -252,6 +252,17 @@ export async function updateUserProfile(userId, patch) {
 }
 
 /* ----------------------------------------------------------------------------
+ * Feedback  (in-app feedback widget)
+ * ------------------------------------------------------------------------- */
+// Insert a feedback row for the current user. type: 'Bug' | 'Suggestion' | 'Question'
+export async function submitFeedback(userId, message, type) {
+  const { error } = await supabase
+    .from('Feedback')
+    .insert({ user_id: userId, message: message.trim(), type });
+  if (error) throw error;
+}
+
+/* ----------------------------------------------------------------------------
  * Storage  (image uploads)
  * ------------------------------------------------------------------------- */
 // Upload a file to a public bucket under the user's own folder (required by the

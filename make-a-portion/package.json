@@ -12,7 +12,10 @@
     "test:ui": "vitest --ui"
   },
   "dependencies": {
+    "@microsoft/clarity": "^1.0.0",
+    "@sentry/react": "^9.0.0",
     "@supabase/supabase-js": "^2.108.2",
+    "@vercel/analytics": "^1.4.1",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-router-dom": "^7.15.0"
