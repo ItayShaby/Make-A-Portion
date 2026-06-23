@@ -39,6 +39,16 @@ function convertUnit(quantity, unit, system) {
   return { quantity: quantity * conv.factor, unit: conv.unit };
 }
 
+// Convert Celsius temperatures inside free text to Fahrenheit (imperial only).
+// Matches "200°C", "200°", "200 מעלות", "200 צלזיוס".
+function convertTemperatures(text, system) {
+  if (system !== 'imperial' || !text) return text;
+  return text.replace(
+    /(\d+(?:\.\d+)?)\s*(?:°\s*c|°|מעלות(?:\s*צלזיוס)?|צלזיוס)/gi,
+    (_m, num) => `${Math.round((Number(num) * 9) / 5 + 32)}°F`,
+  );
+}
+
 export default function RecipePage() {
   const { id } = useParams();
   const { user, profile, requireAuth } = useAuth();
@@ -246,7 +256,9 @@ export default function RecipePage() {
       {recipe.instructions && (
         <>
           <h2 className="recipe-page__section-title">Preparation</h2>
-          <p className="recipe-page__instructions">{recipe.instructions}</p>
+          <p className="recipe-page__instructions">
+            {convertTemperatures(recipe.instructions, unitSystem)}
+          </p>
         </>
       )}
 

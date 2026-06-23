@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import './Sidebar.css';
 
@@ -65,10 +65,10 @@ export default function Sidebar({ isOpen, onClose }) {
 
   return (
     <aside className={`sidebar${isOpen ? ' sidebar--open' : ''}`}>
-      <div className="sidebar__logo">
+      <Link to="/" className="sidebar__logo" onClick={onClose}>
         <p className="sidebar__logo-text">Make A Portion</p>
         <p className="sidebar__logo-sub">Recipe Management</p>
-      </div>
+      </Link>
 
       <nav className="sidebar__nav">
         {NAV_ITEMS.map(({ label, to, icon }) => (
