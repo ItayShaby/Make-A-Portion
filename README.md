@@ -30,19 +30,6 @@ Alternatively, sign in / sign up with one click using **Google**. Browsing recip
 
 **Make A Portion** is a web app for managing and consuming recipes. Users can browse a shared recipe library, save recipes to favorites, add their own recipes, rate and comment — and most importantly: **scale ingredient amounts to the desired number of servings with one click**, and convert between metric and imperial units (including oven temperatures). On top of that, an **AI chef powered by Google Gemini** answers cooking questions and suggests recipes.
 
-## 📸 Screenshots
-
-<p align="center">
-  <img src="RecipePage.png" width="46%" alt="Recipe page — ingredients, servings stepper and unit conversion" />
-  &nbsp;
-  <img src="MyRecipes.png" width="46%" alt="My Recipes" />
-</p>
-<p align="center">
-  <img src="AddARecipe.png" width="46%" alt="Add a recipe" />
-  &nbsp;
-  <img src="Login.png" width="46%" alt="Login screen" />
-</p>
-
 ## 🎯 The problem it solves
 
 Home cooking is messy: recipes are scattered across phone screenshots, "save to self" WhatsApp messages, ad-heavy recipe sites and sticky notes. When you want to cook a recipe written for 6 but you're cooking for 2, you have to recalculate amounts by hand; when a recipe is in ounces and Fahrenheit, you have to convert; and when you get stuck mid-cook ("what can I substitute for butter?") there's no one to ask. **Make A Portion brings it all into one organized, Hebrew, free place.**
@@ -122,6 +109,7 @@ erDiagram
     Users {
         uuid id PK "= auth.uid()"
         text email
+        text password
         text full_name "column: full name"
         text avatar_url
         text measurement_system
@@ -137,9 +125,9 @@ erDiagram
         bigint prep_time
         bigint base_servings
         boolean is_public
-        text instructions
         timestamptz created_at
         timestamptz updated_at
+        text instructions
     }
     Ingredient {
         uuid id PK
@@ -158,6 +146,7 @@ erDiagram
         uuid user_id FK
         uuid recipe_id FK
         smallint score
+        timestamptz created_at
     }
     Comments {
         uuid id PK
