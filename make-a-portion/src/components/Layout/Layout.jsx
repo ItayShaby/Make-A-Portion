@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from '../Sidebar/Sidebar';
 import TopBar from '../TopBar/TopBar';
 import AiAssistant from '../AiAssistant/AiAssistant';
+import FeedbackWidget from '../FeedbackWidget/FeedbackWidget';
 import './Layout.css';
 
 export default function Layout() {
@@ -21,6 +22,7 @@ export default function Layout() {
         </main>
       </div>
       <AiAssistant />
+      <FeedbackWidget />
     </div>
   );
 }
